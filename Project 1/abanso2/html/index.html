@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:http>
+<head>
+    <meta charset="UTF-8">
+    <title>abanso2 - Sentiment Prediction : Homework4 (CS 491)</title>
+</head>
+<body>
+
+<h1>abanso2 - Sentiment Prediction : Homework4 (CS 491)</h1>
+<br>
+<h2>Write up:</h2>
+<h4>1. Processing Steps</h4>
+<p>The project first reads the tweet file and extracts the tweet text by splitting it using comma and passes it to
+    getTweetText function. GetTweetText function applies below mentioned cleaning to clean the tweet text to create the
+    bag-of-words model. Following cleaning techniques are applied on the tweet text:</p>
+
+<ol>
+    <li>
+        Lowercase all characters
+    </li>
+    <li>
+        Stemming using Porter Stemmer
+    </li>
+    <li>
+        Strip punctuations
+    </li>
+    <li>
+        Replace two or more occurrences of the same character with two occurrences. i.e. ‘exciteddddd’ to ‘excitedd’
+    </li>
+    <li>
+        Replace Hash tags, ex. #xyz with xyz
+    </li>
+    <li>
+        Replace a word contains www. or http(s):// with URL
+    </li>
+    <li>
+        Replace a word contains @someuser with AT_USER
+    </li>
+    <li>
+        Ignore words that don’t start with an alphabet
+    </li>
+    <li>
+        Ignore stop words
+    </li>
+    <li>
+        Use html.unescape to replace html escape characters with their meaning
+    </li>
+    <li>
+        Replace apostrophe characters apostrophes to standard lexicons
+    </li>
+</ol>
+
+<p>After creating the bag-of-words for every tweet, hashing TF is applied to transform the RDD to the RDD of Sparse
+    vector. Then transformation using the IDF is performed to generate the tfidf vector for the tweets. This new RDD of
+    tfidf is then zipped with RDD of polarity to form a object of LablePoints. The RDD of new LabledPoints is used for
+    training the model.</p>
+
+<h4>2. Feature Space</h4>
+<p>This project uses bag-of-words model to make predictions on the tweets. Cleaned bag-of-words is passed to hashing
+    transform function. So the feature space is consists of words as its features. As I have applied IDF transform on
+    the tweets the word that is rare and occurs in many tweets is the most important tweet. Thus forming a descending
+    order of features tweets. In this project I have decided to use the unigrams for features. This increaded my tweet
+    prediction accuracy considerably. I didn't got enough time to apply both of these methods. But I will try to apply
+    them during the summer break. </p>
+
+<h4>3. Extra Work</h4>
+<p>In order t achieve higher accuracy, I have applied IDF transformation on the bag-of-words model to get more accurate
+    and precise feature space. This helped me increase my accuracy sufficiently enough. In addition to that I have used
+    Snowball Steamer to get more accurate root words. Moreover I have used html.unescape to replace html escape
+    characters with their meaning. I transformed all the apostrophe's to their respective meaning to get the proper
+    words.</p>
+<p>I have created my own functions to calculate accuracy, precision, recall, f1score. I have also created a function to
+    compute rate of false positive and true positive in order to plot ROC curve.</p>
+<p>For Logistic regression, I have increased number of iterations so as to train the model properly.</p>
+
+<h4>4. Accuracy</h4>
+<b>Naive Bayes Classifier:</b> <br>
+<br><i>Results on Training - Training:</i>
+<br>Avg Train accuracy :0.8323572433422919
+<br>Avg Train precision :0.8481331204385972
+<br>Avg Train recall :0.8097247384639162
+<br>Avg Train F1score :0.8284709862802426
+<br><br><i>Results on 10-fold Training:</i>
+<br>Avg k-fold accuracy :0.7150153465842254
+<br>Avg k-fold precision :0.7264455459251299
+<br>Avg k-fold recall :0.6899021757401264
+<br>Avg k-fold F1score :0.7076388577515431
+<br><br><i>Results on Training - Testing:</i>
+<br>Avg test accuracy :0.7562674094707521
+<br>Avg test precision :0.7755672890929253
+<br>Avg test recall :0.7307692307692308
+<br>Avg test F1score :0.7524078098483808
+
+<br><br>
+<b>Logistic Regression Classifier:</b> <br>
+<br><i>Results on Training - Training:</i>
+<br>Avg Train accuracy :0.8702240056405414
+<br>Avg Train precision :0.8733321225759354
+<br>Avg Train recall :0.8660613769317773
+<br>Avg Train F1score :0.869681398093816
+<br><br><i>Results on 10-fold Training:</i>
+<br>Avg k-fold accuracy :0.7222826957918002
+<br>Avg k-fold precision :0.7251359405523898
+<br>Avg k-fold recall :0.715983083770586
+<br>Avg k-fold F1score :0.7204995495662077
+<br><br><i>Results on Training - Testing:</i>
+<br>Avg test accuracy :0.7498607242339832
+<br>Avg test precision :0.7294323363688702
+<br>Avg test recall :0.8060439560439561
+<br>Avg test F1score :0.7656818012956886
+<br>
+
+<br>confusion Matrix
+<br>[134.,   43.],[  38.,  144.]
+<br>
+
+<h4>5. Accuracy Plots</h4>
+<p>The accuracy plots of Naive Bayes classifier and Logistic Regression classifier are plot in single graph to compare
+    amongst themselves.</p>
+<img src="Accuracy_plot_abanso2.png">
+<p>The ROC curve is plot for Logistic regression as it is not available for Naive Bayes classifier.</p>
+<img src="ROC_plot_abanso2.png">
+
+<p>From the plot you can clearly see that, in this case, Logistic regression overfits the most as the difference between
+    the train-train and train-test accuracy is more.</p>
+
+<h4>6. Precision, Recall, F1-Score</h4>
+<p>The effectiveness of classifier can be evaluated on accuracy, but there are other metrics as well, such as Precision,
+    Recall and F1 measure.
+</p>
+<p>Precision measures the exactness of a classifier. A higher precision means less false
+    positives, while a lower precision means more false positives. This is often at odds with recall, as an easy way to
+    improve precision is to decrease recall.</p>
+<p>Recall measures the completeness, or sensitivity, of a classifier. Higher recall means less false negatives, while
+    lower recall means more false negatives. Improving recall can often decrease precision because it gets increasingly
+    harder to be precise as the sample space increases.</p>
+<p>Precision and recall can be combined to produce a single metric known as F-measure, which is the weighted harmonic
+    mean of precision and recall. I find F-measure to be about as useful as accuracy. Or in other words, compared to
+    precision & recall, F-measure is mostly useless, as you’ll see below.</p>
+
+<h4>7. ROC</h4>
+<p>ROC curve is plotted against false positive rate against true positive rate for different values of threshold. The
+    closer the curve follows the left-hand border and then the top border of the ROC space, the more accurate the
+    test. It shows the tradeoff between sensitivity and specificity. </p>
+<p>Refer to the plot of ROC curve. </p>
+
+<h4>8. Top 20 features</h4>
+<p>I cannot find a spark API which I can use to find the top 20 features.</p>
+
+<h4>9. Best Classifier</h4>
+<p>Logistic regression performs the best. As Naive bayes takes the assumption that all features are independent and
+    therefore its performance is not that good.</p>
+
+<h4>10. Top 5 best classified tweets</h4>
+<p>5 tweets correctly classified with their probabilities are below:</p>
+<br>0.882 : "VIRAL MARKETING FAIL. This Acia Pills brand oughta get shut down for hacking into people's messenger's.  i get 5-6 msgs in a day! Arrrgh!"
+<br>0.849 : "Loves twitter"
+<br>0.768 : "Blink by malcolm gladwell amazing book and The tipping point!"
+<br>0.753 : "Booz Allen Hamilton has a bad ass homegrown social collaboration platform. Way cool!  #ttiv"
+<br>0.721 : "SLICKSPIT","SHOUT OUTS TO ALL EAST PALO ALTO FOR BEING IN THE BUILDIN KARIZMAKAZE 50CAL GTA! ALSO THANKS TO PROFITS OF DOOM UNIVERSAL HEMPZ CRACKA......"
+
+<p>5 tweets incorrectly classified with their probabilities are below:</p>
+<br>0.155 : "luke and i got stopped walking out of safeway and asked to empty our pockets and lift our shirts. how jacked up is that?"
+<br>0.148 : "Talk is Cheap: Bing that, I?ll stick with Google. http://bit.ly/XC3C8"
+<br>0.134 : "Man I kinda dislike Apple right now. Case in point: the iPhone 3GS. Wish there was a video recorder app. Please?? http://bit.ly/DZm1T"
+<br>0.121 : "I can't wait, going to see star trek tonight!!"
+<br>0.097 : "using Linux and loving it - so much nicer than windows... Looking forward to using the wysiwyg latex editor!"
+
+
+
+</body>
+</html>
